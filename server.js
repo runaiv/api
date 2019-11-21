@@ -48,19 +48,31 @@ const server = http.createServer(function(request, response) {
     }
   }
   if (request.method === 'DELETE') {
-    if (pathname === '/students') {
+    if(pathname.match(/^\/students\/(\d)$/g)){
+        
+      console.log(id)
       request.on('end', () => {
         console.log(request.headers)
         let data
         if (!fs.existsSync(LOCAL_DATABASE)) {
-          console.log("file doesn't exist.")
-        } 
-        else {
+          user.id = 1
+          data = [user]
+        } else {
           const json = require(`./${LOCAL_DATABASE}`)
-          delete json
-          console.log("file must be deleted normally")
+          user.id = json.length + 1
+          json.push(user)
+          data = json
         }
         fs.writeFileSync(LOCAL_DATABASE, JSON.stringify(data, null, 4))
+      })
+    }
+    else if (pathname === '/students') {
+      request.on('end', () => {
+        console.log(request.headers)
+        if (!fs.existsSync(LOCAL_DATABASE)) {
+          console.log("file doesn't exist.")
+        } 
+        fs.writeFileSync(LOCAL_DATABASE, JSON.stringify([], null, 4))
       })
       // 2 file system managment 
     }
